@@ -52,11 +52,22 @@ data['cols_to_check'] = data['teks'].replace({
                                                 ',': '',
                                                 "'": '',
                                               }, regex=True)
-data['check'] = data['cols_to_check'].str.replace(r'[https]+[?://]+[^\s<>"]+|www\.[^\s<>"]+[@?()]+[(??)]', "",regex=True)
-'''
-def lemmatize_text(text):
+data['check'] = data['cols_to_check'].str.replace(r'[https]+[?://]+[^\s<>"]+|www\.[^\s<>"]+[@?()]+[(??)]+[)*]+[(\xa0]+[-&gt...]', "",regex=True)
+
+https = "https"
+clean = []
+def cleaner():
+    for x in data['cols_to_check'].iteritems():
+        x.str.find("https")
+        print(x)
+
+cleaner()
+check = print(data.check[1])
+'''def lemmatize_text(text):
     return [lemmatizer.lemmatize(w) for w in w_tokenizer.tokenize(text)]
 
-data['text_lemmatized'] = data.teks.apply(lemmatize_text)'''
+data['lemma'] = data.check.apply(lemmatize_text)'''
+
+
 
 
