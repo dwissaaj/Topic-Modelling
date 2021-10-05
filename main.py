@@ -1,13 +1,18 @@
-import tes_json
 import nltk
+
 import pyLDAvis
 
 import pyLDAvis.gensim_models
 import spacy
+#model = spacy.load("xx_ent_wiki_sm", disable=['parser', 'ner'])
+import en_core_web_sm
+
+model = en_core_web_sm.load()
+
 w_tokenizer = nltk.tokenize.WhitespaceTokenizer()
 lemmatizer = nltk.stem.WordNetLemmatizer()
 
-model = spacy.load('xx_ent_wiki_sm', disable=['parser', 'ner'])
+
 from nltk.corpus import stopwords
 import pandas as pd
 
@@ -16,7 +21,7 @@ import gensim.corpora as corpora
 from gensim.utils import simple_preprocess
 from gensim.models import CoherenceModel
 
-import tes_json
+
 
 import warnings
 
@@ -24,16 +29,6 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 stopwords = stopwords.words("indonesian")
 
-
-def load_data(file):
-    with open(file, "r", encoding="utf-8") as f:
-        data = tes_json.load(f)
-    return data
-
-
-def write_data(file, data):
-    with open(file, "w", encoding="utf-8") as f:
-        tes_json.dump(data, f, indent=4)
 
 
 #data = load_data("file.json")
@@ -80,5 +75,9 @@ lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
                                             chunksize=100,
                                             passes=10,
                                             alpha='auto')
+
 py = pyLDAvis.gensim_models.prepare(lda_model,corpus,id2word,mds='mmds',R=30)
+
+extract = pyLDAvis.save_html(py,"done.html")
+
 
