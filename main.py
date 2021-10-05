@@ -55,12 +55,12 @@ data['cols_to_check'] = data['teks'].replace({
                                               }, regex=True)
 data['check'] = data['cols_to_check'].str.replace(r'[https]+[?://]+[^\s<>"]+|www\.[^\s<>"]+[@?()]+[(??)]+[)*]+[(\xa0]+[-&gt...]', "",regex=True)
 
-
+data['clean'] = data['check'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stopwords)]))
 
 def lemmatize_text(text):
     return [lemmatizer.lemmatize(w) for w in w_tokenizer.tokenize(text)]
 
-data['lemma'] = data.check.apply(lemmatize_text)
+data['lemma'] = data.clean.apply(lemmatize_text)
 
 lemma = data['lemma']
 
@@ -82,4 +82,3 @@ lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
                                             alpha='auto')
 py = pyLDAvis.gensim_models.prepare(lda_model,corpus,id2word,mds='mmds',R=30)
 
-x = pyLDAvis.save_html(py,'viz.html')
