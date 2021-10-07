@@ -1,83 +1,37 @@
+
 import nltk
-
-import pyLDAvis
-
-import pyLDAvis.gensim_models
-import spacy
-#model = spacy.load("xx_ent_wiki_sm", disable=['parser', 'ner'])
-import en_core_web_sm
-
-model = en_core_web_sm.load()
-
-w_tokenizer = nltk.tokenize.WhitespaceTokenizer()
-lemmatizer = nltk.stem.WordNetLemmatizer()
-
-
-from nltk.corpus import stopwords
-import pandas as pd
-
-import gensim
+nltk.download('wordnet')
 import gensim.corpora as corpora
 from gensim.utils import simple_preprocess
 from gensim.models import CoherenceModel
-
-
-
+import pyLDAvis
+from nltk.corpus import stopwords
+import pandas as pd
 import warnings
+import pyLDAvis.gensim_models
+import spacy
+import openpyxl
+
+model = spacy.load("xx_ent_wiki_sm", disable=['parser', 'ner'])
+w_tokenizer = nltk.tokenize.WhitespaceTokenizer()
+lemmatizer = nltk.stem.WordNetLemmatizer()
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-
 stopwords = stopwords.words("indonesian")
 
+data = pd.read_excel('bersih.xlsx')
 
+data1 = data.copy()
+data1 = data1.drop_duplicates(subset='content')
 
-#data = load_data("file.json")
+data1['content'] = data1['content'].str.lstrip()
+data1['content'] = data1['content'].str.lower()
 
-encoding = 'unicode_escape'
-data = pd.read_csv("tweet.csv", encoding= 'unicode_escape', sep='delimiter', header=None)
-data = data.rename(columns={0: 'teks'})
-
-data['cols_to_check'] = data['teks'].replace({
-                                              '"':'',
-                                              '\d+':'',
-                                              ':':'',
-                                              ';':'',
-                                              '#':'',
-                                              '@':'',
-                                              '_':'',
-                                                ',': '',
-                                                "'": '',
-                                              }, regex=True)
-data['check'] = data['cols_to_check'].str.replace(r'[https]+[?://]+[^\s<>"]+|www\.[^\s<>"]+[@?()]+[(??)]+[)*]+[(\xa0]+[-&gt...]', "",regex=True)
-
-data['clean'] = data['check'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stopwords)]))
+data1['content'] = data1['content'].apply(str)
+data1['content'] = data1['content'].fillna("pos")
 
 def lemmatize_text(text):
     return [lemmatizer.lemmatize(w) for w in w_tokenizer.tokenize(text)]
 
-data['lemma'] = data.clean.apply(lemmatize_text)
-
-lemma = data['lemma']
-
-
-id2word = corpora.Dictionary(lemma)
-
-corpus = []
-for text in lemma:
-    new = id2word.doc2bow(text)
-    corpus.append(new)
-
-lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus,
-                                            id2word=id2word,
-                                            num_topics=20,
-                                            random_state=100,
-                                            update_every=1,
-                                            chunksize=100,
-                                            passes=10,
-                                            alpha='auto')
-
-py = pyLDAvis.gensim_models.prepare(lda_model,corpus,id2word,mds='mmds',R=30)
-
-extract = pyLDAvis.save_html(py,"done.html")
-
-
+data2 = data1.copy()
+data2['lemma'] = data1.content.apply(lemmatize_text)
