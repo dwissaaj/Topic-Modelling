@@ -1,4 +1,6 @@
 import pandas as pd
+import spacy
+
 encoding = 'unicode_escape'
 list_data = pd.read_csv("tweet.csv", encoding= 'unicode_escape', sep='delimiter', header=None,engine='python')
 list_data['teks'] = list_data
@@ -52,3 +54,30 @@ extract = pyLDAvis.save_html(py,"done.html")
 
 
 
+def lemmatization(texts,allowed_postags=['NOUN','ADJ']):
+    nlp = spacy.load("xx_ent_wiki_sm", disable=['parser', 'ner'])
+    texts_out = []
+    for text in texts:
+        doc = nlp(text)
+        new_text = []
+        for token in doc:
+            if token.pos_ in allowed_postags:
+                new_text.append(token)
+
+textlist = data1['content'].tolist()
+tokenizex = lemmatization(textlist)
+def lemmatization(texts,allowed_postags=['NOUN','ADJ']):
+    nlp = spacy.load("xx_ent_wiki_sm", disable=['parser', 'ner'])
+    texts_out = []
+    for text in texts:
+        doc = nlp(text)
+        new_text = []
+        for token in doc:
+            if token.pos_ in allowed_postags:
+                new_text.append(token.lemma_)
+        final = " ".join(new_text)
+        texts_out.append(final)
+    return (texts_out)
+
+
+lemmatized = lemmatization(data2)
